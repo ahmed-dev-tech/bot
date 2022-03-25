@@ -1,0 +1,7 @@
+python-binance
+numpy
+websocket_client
+TA_Lib-0.4.24-cp37-cp37m-win_amd64.whl
+python-binance
+backtrader
+flask
