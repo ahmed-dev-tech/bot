@@ -6,3 +6,4 @@ python-binance
 backtrader
 flask
 telebot
+keyboard
