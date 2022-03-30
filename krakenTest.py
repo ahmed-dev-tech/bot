@@ -41,6 +41,7 @@ def krakenBot():
             time.sleep(3)
             resp = requests.get('https://api.kraken.com/0/public/Ticker?pair={pair}'.format(pair=pair))
             pprint.pprint(resp.json())
+            print("Press Esc to exit")
             if keyboard.is_pressed('Esc'):
                 print("\nyou pressed Esc, so exiting...")
                 flag=False
