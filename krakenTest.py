@@ -4,14 +4,14 @@ import json, pprint
 import keyboard
 import sys
 def krakenBot():
-    options=input("Select options:\nPress 1 to view all assets detail\nPress 2 to Get Tradable Asset Pairs\nPress 2 to Get Ticker Information\nPress 4 to Get OHLC Data\nPress 5 to Get Order Book\npress 6 to Get Recent Trades\n")
+    options=input("Select options:\nPress 1 to view all assets detail\nPress 2 to Get Tradable Asset Pairs\nPress 3 to Get Ticker Information\nPress 4 to Get OHLC Data\nPress 5 to Get Order Book\npress 6 to Get Recent Trades\n")
     if options=="1":
         resp = requests.get('https://api.kraken.com/0/public/Assets')
         pprint.pprint(resp.json())
         boolAssetPair=input("\nDo you want specific Asset pairs?(y/n): ")
         if(boolAssetPair=="y"):
             assetPairs=input("Enter your asset pairs e.g. XBT,ETH : ")
-            resp = requests.get('https://api.kraken.com/0/public/Assets?asset={assetPairs}'.format(assetPair=assetPair))
+            resp = requests.get('https://api.kraken.com/0/public/Assets?asset={assetPairs}'.format(assetPairs=assetPairs))
             pprint.pprint(resp.json())
         else:
             re=input("Do you want to rerun Program (y/n): ")
