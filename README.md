@@ -9,3 +9,11 @@ all other instructions will avaliable during running of code
 
 set your Telegram API key in .env file 
 
+
+# Kraken API
+
+set your kraken API inside Kraken folder's config.py
+
+# Binance API
+
+set your Binance API inside Binance folder's config.py
