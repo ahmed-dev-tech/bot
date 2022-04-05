@@ -4,6 +4,18 @@ import json, pprint
 import keyboard
 import sys
 import os
+import urllib.parse
+import hashlib
+import hmac
+import base64
+
+def get_kraken_signature(urlpath, data, secret):
+    postdata = urllib.parse.urlencode(data)
+    encoded = (str(data['nonce']) + postdata).encode()
+    message = urlpath.encode() + hashlib.sha256(encoded).digest()
+    mac = hmac.new(base64.b64decode(secret), message, hashlib.sha512)
+    sigdigest = base64.b64encode(mac.digest())
+    return sigdigest.decode()
 # Attaches auth headers and returns results of a POST request
 def kraken_request(uri_path, data, api_key, api_sec):
     headers = {}
@@ -106,8 +118,8 @@ def krakenBot():
     elif options=="7":
 # Read Kraken API key and secret stored in environment variables
         api_url = "https://api.kraken.com"
-        in_api_key = input("Enter Your API Key: ")
-        in_api_secret = input("Enter Your API secret: ")
+        in_api_key = input("Enter Your Kraken API Key: ")
+        in_api_secret = input("Enter Your Kraken API secret: ")
         api_key = in_api_key
         api_sec = in_api_secret
         # Construct the request and print the result
@@ -124,8 +136,8 @@ def krakenBot():
     elif options=="8":
     # Read Kraken API key and secret stored in environment variables
         api_url = "https://api.kraken.com"
-        in_api_key = input("Enter Your API Key: ")
-        in_api_secret = input("Enter Your API secret: ")
+        in_api_key = input("Enter Your Kraken API Key: ")
+        in_api_secret = input("Enter Your Kraken API secret: ")
         api_key = in_api_key
         api_sec = in_api_secret
         # Construct the request and print the result
@@ -143,8 +155,8 @@ def krakenBot():
     elif options=="9":
         # Read Kraken API key and secret stored in environment variables
         api_url = "https://api.kraken.com"
-        in_api_key = input("Enter Your API Key: ")
-        in_api_secret = input("Enter Your API secret: ")
+        in_api_key = input("Enter Your Kraken API Key: ")
+        in_api_secret = input("Enter Your Kraken API secret: ")
         api_key = in_api_key
         api_sec = in_api_secret
         # Construct the request and print the result
