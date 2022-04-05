@@ -19,7 +19,7 @@ def kraken_request(uri_path, data, api_key, api_sec):
     req = requests.post((api_url + uri_path), headers=headers, data=data)
     return req
 def krakenBot():
-    options=input("Select options:\nPress 1 to view all assets detail\nPress 2 to Get Tradable Asset Pairs\nPress 3 to Get Ticker Information\nPress 4 to Get OHLC Data\nPress 5 to Get Order Book\npress 6 to Get Recent Trades\nPress 7 to Get open orders\nPress 8 to Get close orders\nPress 9 to Get Open Positions\n")
+    options=input("Select options:\nPress 1 to view all assets detail\nPress 2 to Get Tradable Asset Pairs\nPress 3 to Get Ticker Information\nPress 4 to Get OHLC Data\nPress 5 to Get Order Book\npress 6 to Get Recent Trades\nPress 7 to Get open orders\nPress 8 to Get close orders\nPress 9 to Get Open Positions\nPress 10 to Get Historical Data\n")
     if options=="1":
         resp = requests.get('https://api.kraken.com/0/public/Assets')
         pprint.pprint(resp.json())
@@ -158,8 +158,32 @@ def krakenBot():
             "nonce": str(int(1000*time.time())),
             "docalcs": True
         }, api_key, api_sec)
-
         print(resp.json())
+        re=input("Do you want to rerun Program (y/n): ")
+        if re=="y":
+            krakenBot()
+        else:
+            sys.exit()
+    elif options=="10":
+        # Read Kraken API key and secret stored in environment variables
+        api_url = "https://api.kraken.com"
+        in_api_key = input("Enter Your Kraken API Key: ")
+        in_api_secret = input("Enter Your Kraken API secret: ")
+        api_key = in_api_key
+        api_sec = in_api_secret
+        # Construct the request and print the result
+        resp = kraken_request('/0/private/RetrieveExport', {
+    "nonce": str(int(1000*time.time())),
+    "id":"TCJA"
+        }, api_key, api_sec)
+
+        # Write export to a new file 'myexport.zip'
+        target_path = 'myexport.zip'
+        handle = open(target_path, "wb")
+        for chunk in resp.iter_content(chunk_size=512):
+            if chunk:  # filter out keep-alive new chunks
+                handle.write(chunk)
+        handle.close()
         re=input("Do you want to rerun Program (y/n): ")
         if re=="y":
             krakenBot()
