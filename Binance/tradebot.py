@@ -16,6 +16,7 @@ RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
 TRADE_SYMBOL = input("Trade Symbol (in caps)..... eg 'ETHUSD': ")
 TRADE_QUANTITY = float(input("Trade Price Quantity e.g. 0.5 , 0.05: "))
 
+opens = []
 closes = []
 in_position = False
 
@@ -38,7 +39,7 @@ def on_close(ws):
     print('closed connection')
 
 def on_message(ws, message):
-    global closes, in_position
+    global opens,closes, in_position
     
     print('received message')
     json_message = json.loads(message)
@@ -48,16 +49,17 @@ def on_message(ws, message):
 
     is_candle_closed = candle['x']
     close = candle['c']
+    open1 = candle['o']
 
-    if is_candle_closed:
-        print("candle closed at {}".format(close))
-        closes.append(float(close))
-        print("closes")
-        print(closes)
+    if not is_candle_closed:
+        print("candle opens at {}".format(open1))
+        opens.append(float(open1))
+        print("opens")
+        print(opens)
 
-        if len(closes) > int(RSI_PERIOD):
-            np_closes = numpy.array(closes)
-            rsi = talib.RSI(np_closes, RSI_PERIOD)
+        if len(opens) > int(RSI_PERIOD):
+            np_opens = numpy.array(opens)
+            rsi = talib.RSI(np_opens, RSI_PERIOD)
             print("all rsis calculated so far")
             print(rsi)
             last_rsi = rsi[-1]
@@ -77,6 +79,41 @@ def on_message(ws, message):
                 else:
                     print("It is overbought, but we don't own any. Nothing to do.")
             
+            if last_rsi < RSI_OVERSOLD:
+                if in_position:
+                    print("It is oversold, but you already own it, nothing to do.")
+                else:
+                    print("Oversold! Buy! Buy! Buy!")
+                    # put binance buy order logic here
+                    # order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
+                    order_succeeded=''
+                    if order_succeeded:
+                        in_position = True
+    if is_candle_closed:
+        print("candle closed at {}".format(close))
+        closes.append(float(close))
+        print("closes")
+        print(closes)
+        if len(closes) > int(RSI_PERIOD):
+            np_closes = numpy.array(closes)
+            rsi = talib.RSI(np_closes, RSI_PERIOD)
+            print("all rsis calculated so far")
+            print(rsi)
+            last_rsi = rsi[-1]
+            print("the current rsi is {}".format(last_rsi))
+            if last_rsi > int(RSI_OVERBOUGHT):
+                if in_position:
+                    print("Overbought! Sell! Sell! Sell!")
+                    # put binance sell logic here
+                    # order_succeeded = order(SIDE_SELL, TRADE_QUANTITY, TRADE_SYMBOL)
+                    order_succeeded=''
+                    if order_succeeded:
+                        in_position = False
+                    # @bot.message_handler(func=order_succeeded)                   
+                    # def sendSellSignal(message):
+                    #     bot.send_message(message.chat.id, "Sell")
+                else:
+                    print("It is overbought, but we don't own any. Nothing to do.")
             if last_rsi < RSI_OVERSOLD:
                 if in_position:
                     print("It is oversold, but you already own it, nothing to do.")
