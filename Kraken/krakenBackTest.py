@@ -16,11 +16,11 @@ class RSIStrategy(bt.Strategy):
 
 cerebro = bt.Cerebro()
 
-fromdate = datetime.datetime.strptime('2020-01-01', '%Y-%m-%d')
-todate = datetime.datetime.strptime('2020-01-12', '%Y-%m-%d')
 
+fromdate = datetime.datetime.strptime('2017-06-01', '%Y-%m-%d') #set your start date here as of kraken_rig_runner.py's line
+todate = datetime.datetime.strptime('2017-06-14', '%Y-%m-%d')
 
-data = bt.feeds.GenericCSVData(dataname='2020_15minutes.csv', dtformat=2, timeframe=bt.TimeFrame.Minutes, fromdate=fromdate, todate=todate)
+data = bt.feeds.GenericCSVData(dataname='save.csv', dtformat=2, timeframe=bt.TimeFrame.Minutes, fromdate=fromdate, todate=todate)
 
 cerebro.adddata(data)
 
@@ -29,3 +29,7 @@ cerebro.addstrategy(RSIStrategy)
 cerebro.run()
 
 cerebro.plot()
+
+
+
+

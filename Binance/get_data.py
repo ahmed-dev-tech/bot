@@ -11,7 +11,7 @@ client = Client(config.API_KEY, config.API_SECRET)
 csvfile = open('2020_15minutes.csv', 'w', newline='') 
 candlestick_writer = csv.writer(csvfile, delimiter=',')
 
-candlesticks = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_15MINUTE, "1 Jan, 2020", "12 Jul, 2020")
+candlesticks = client.get_historical_klines("ETHBTC", Client.KLINE_INTERVAL_15MINUTE, "1 Jan, 2020", "12 Jan, 2020")
 #candlesticks = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_1DAY, "1 Jan, 2020", "12 Jul, 2020")
 #candlesticks = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_1DAY, "1 Jan, 2017", "12 Jul, 2020")
 

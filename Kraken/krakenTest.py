@@ -52,10 +52,14 @@ def krakenBot():
     elif options=="3":
         pair=input("To get live Ticker Info Enter pair e.g. XBTUSD: ")
         flag=True
+        resp = requests.get('https://api.kraken.com/0/public/Ticker?pair={pair}'.format(pair=pair))
+        pprint.pprint(resp.json()['result'])
+        setValuePair=input("Value Pair: ")
         while(flag):
             time.sleep(3)
             resp = requests.get('https://api.kraken.com/0/public/Ticker?pair={pair}'.format(pair=pair))
-            pprint.pprint(resp.json())
+            val=resp.json()['result']['{setValuePair}'.format(setValuePair=setValuePair)]
+            print(val['c'][0])
             print("Press Esc to exit")
             if keyboard.is_pressed('Esc'):
                 print("\nyou pressed Esc, so exiting...")
@@ -173,8 +177,8 @@ def krakenBot():
         api_sec = in_api_secret
         # Construct the request and print the result
         resp = kraken_request('/0/private/RetrieveExport', {
-    "nonce": str(int(1000*time.time())),
-    "id":"TCJA"
+        "nonce": str(int(1000*time.time())),
+        "id":"TCJA"
         }, api_key, api_sec)
 
         # Write export to a new file 'myexport.zip'
@@ -189,6 +193,62 @@ def krakenBot():
             krakenBot()
         else:
             sys.exit()
+    elif options=="11":
+        print("Bot Configurations\n")
+        # RSI_PERIOD = int(input("Set your RSI period example 14: "))
+        # RSI_OVERBOUGHT = int(input("Set your RSI OverBought limit eg 70: "))
+        # RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
+        TRADE_SYMBOL = input("Trade Symbol (in caps)..... eg 'ETHUSD': ")
+        TRADE_QUANTITY = float(input("Trade Price Quantity e.g. 0.5 , 0.05: "))
+        buy_limit=int(input("Enter your Buy limit: "))
+        sell_limit=int(input("Enter your Sell limit: "))
+        api_url = "https://api.kraken.com"
+        in_api_key = input("Enter Your Kraken API Key: ")
+        in_api_secret = input("Enter Your Kraken API secret: ")
+        api_key = in_api_key
+        api_sec = in_api_secret
+        closes = []
+        in_position = False
+        flag=True
+        resp = requests.get('https://api.kraken.com/0/public/Ticker?pair={pair}'.format(pair=pair))
+        pprint.pprint(resp.json()['result'])
+        setValuePair=input("Value Pair (Symbol on terminal's left corner): ")
+        while(flag):
+            time.sleep(3)
+            resp = requests.get('https://api.kraken.com/0/public/Ticker?pair={pair}'.format(pair=pair))
+            val=resp.json()['result']['{setValuePair}'.format(setValuePair=setValuePair)]
+            if float(val['c'][0]) < buy_limit:
+                print("Buying of {TRADE_SYMBOL} at {price}!!!".format(price=val['c'][0],TRADE_SYMBOL=TRADE_SYMBOL))
+                resp = kraken_request('/0/private/AddOrder', {
+                "nonce": str(int(1000*time.time())),
+                "ordertype": "market",
+                "type": "buy",
+                "volume": TRADE_QUANTITY,
+                "pair": TRADE_SYMBOL,
+                }, api_key, api_sec)
+                if not resp.json()['error']:
+                    print("Sucessfully Buy {TRADE_SYMBOL} at {price}".format(price=val['c'][0],TRADE_SYMBOL=TRADE_SYMBOL))
+                else:
+                    print("Error : {error}".format(error=resp.json()['error']))
+            elif float(val['c'][0]) > sell_limit:
+                print("Selling of {TRADE_SYMBOL} at {price}!!!".format(price=val['c'][0],TRADE_SYMBOL=TRADE_SYMBOL))
+                resp = kraken_request('/0/private/AddOrder', {
+                "nonce": str(int(1000*time.time())),
+                "ordertype": "market",
+                "type": "sell",
+                "volume": TRADE_QUANTITY,
+                "pair": TRADE_SYMBOL,
+                }, api_key, api_sec)
+                if not resp.json()['error']:
+                    print("Sucessfully Sell {TRADE_SYMBOL} at {price}".format(price=val['c'][0],TRADE_SYMBOL=TRADE_SYMBOL))
+                else:
+                    print("Error : {error}".format(error=resp.json()['error']))
+            else:
+                print("Current Price: {price}, not buying and selling ".format(price=val['c'][0]))
+            print("Press Esc to exit")
+            if keyboard.is_pressed('Esc'):
+                print("\nyou pressed Esc, so exiting...")
+                flag=False
     else:
         re=input("Do you want to rerun Program (y/n): ")
         if re=="y":
