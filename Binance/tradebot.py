@@ -20,17 +20,17 @@ opens = []
 closes = []
 in_position = False
 
-# client = Client(config.API_KEY, config.API_SECRET, tld='us')
+client = Client(config.API_KEY, config.API_SECRET, tld='us')
 
-# def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
-#     try:
-#         print("sending order")
-#         order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
-#         print(order)
-#     except Exception as e:
-#         print("an exception occured - {}".format(e))
-#         return False
-#     return True
+def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
+    try:
+        print("sending order")
+        order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
+        print(order)
+    except Exception as e:
+        print("an exception occured - {}".format(e))
+        return False
+    return True
 
 def on_open(ws):
     print('opened connection')
@@ -69,8 +69,8 @@ def on_message(ws, message):
                 if in_position:
                     print("Overbought! Sell! Sell! Sell!")
                     # put binance sell logic here
-                    # order_succeeded = order(SIDE_SELL, TRADE_QUANTITY, TRADE_SYMBOL)
-                    order_succeeded=''
+                    order_succeeded = order(SIDE_SELL, TRADE_QUANTITY, TRADE_SYMBOL)
+                    # order_succeeded=''
                     if order_succeeded:
                         in_position = False
                     # @bot.message_handler(func=order_succeeded)                   
@@ -85,8 +85,8 @@ def on_message(ws, message):
                 else:
                     print("Oversold! Buy! Buy! Buy!")
                     # put binance buy order logic here
-                    # order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
-                    order_succeeded=''
+                    order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
+                    # order_succeeded=''
                     if order_succeeded:
                         in_position = True
     if is_candle_closed:
@@ -105,7 +105,7 @@ def on_message(ws, message):
                 if in_position:
                     print("Overbought! Sell! Sell! Sell!")
                     # put binance sell logic here
-                    # order_succeeded = order(SIDE_SELL, TRADE_QUANTITY, TRADE_SYMBOL)
+                    order_succeeded = order(SIDE_SELL, TRADE_QUANTITY, TRADE_SYMBOL)
                     order_succeeded=''
                     if order_succeeded:
                         in_position = False
@@ -120,8 +120,8 @@ def on_message(ws, message):
                 else:
                     print("Oversold! Buy! Buy! Buy!")
                     # put binance buy order logic here
-                    # order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
-                    order_succeeded=''
+                    order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
+                    # order_succeeded=''
                     if order_succeeded:
                         in_position = True
     #                 @bot.message_handler(func=order_succeeded)                   
