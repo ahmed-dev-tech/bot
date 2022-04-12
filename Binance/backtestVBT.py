@@ -21,7 +21,7 @@ interval=input("Enter interval 1m , 1d , 1y :  ")
 binance_data = vbt.BinanceData.download(pair,start=start,end=end,interval=interval,missing_index='drop')
 print(binance_data.get())
 
-options = input("\nPress 1 for Moving Average Backtesting Strategy\n\nPress 2 for RSI Backtesting Strategy:  ")
+options = input("\nPress 1 for Moving Average Backtesting Strategy\nPress 2 for RSI Backtesting Strategy:\n  ")
 
 if options == "1":
     print("Moving Averages")
@@ -38,8 +38,8 @@ if options == "1":
     freq=input("freq: 1D ")
     pf_kwargs = dict(size=np.inf, fees=fee, freq=freq)
     pf = vbt.Portfolio.from_signals(binance_data.get('Close'), entries, exits, **pf_kwargs)
-    print(pf[(10, 20, pair)].stats())
     pf[(10, 20, pair)].plot().show()
+    print(pf[(10, 20, pair)].stats())
 else:
     print("RSI")
     rsi=vbt.RSI.run(binance_data.get('Close'))
@@ -49,8 +49,8 @@ else:
     exits = rsi.rsi_above(rsi_exit)
     initialCash=int(input("initial cash : 1000 "))
     pf=vbt.Portfolio.from_signals(binance_data.get('Close'),entries,exits,init_cash=initialCash)
-    print(pf.stats())
-    pf.plot().show()    
+    pf.plot().show()
+    print(pf.stats())    
 # # fig = pf.total_return().vbt.heatmap(
 # #     x_level='fast_window', y_level='slow_window', slider_level='symbol', symmetric=True,
 # #     trace_kwargs=dict(colorbar=dict(title='Total return', tickformat='%')))
