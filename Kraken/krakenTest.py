@@ -220,7 +220,7 @@ def krakenBot():
             resp = requests.get('https://api.kraken.com/0/public/Ticker?pair={pair}'.format(pair=pair))
             val=resp.json()['result']['{setValuePair}'.format(setValuePair=setValuePair)]
             if val['o'] < sell_limit :
-                print("candle opens at {}".format(open1))
+                print("candle opens at {open1}".format(open1=open1))
                 opens.append(float(open1))
                 print("opens")
                 print(opens)
