@@ -1,3 +1,11 @@
-#binance API and set Telegram API in .env file
-API_KEY = 'yourbinanceapikey'
-API_SECRET = 'yourbinanceapisecret'
+#binance API and Asset pair
+API_KEY = ""
+API_SECRET = ""
+
+TESTNET_API_KEY = ""
+TESTNET_API_SECRET = ""
+
+BASE_ASSET = "ETH"
+QUOTE_ASSET = "USDT"
+
+TRADESYMBOL = BASE_ASSET + QUOTE_ASSET
