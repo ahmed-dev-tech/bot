@@ -197,9 +197,9 @@ def krakenBot():
             sys.exit()
     elif options=="11":
         print("Bot Configurations\n")
-        RSI_PERIOD = int(input("length of open trades limit e.g. 10: "))
-        RSI_OVERBOUGHT = int(input("Set your RSI OverBought limit eg 70: "))
-        RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
+        # RSI_PERIOD = int(input("length of open trades limit e.g. 10: "))
+        # RSI_OVERBOUGHT = int(input("Set your RSI OverBought limit eg 70: "))
+        # RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
         pair=input("Enter pair e.g. XBTUSD: ")
         TRADE_QUANTITY = float(input("Trade Price Quantity e.g. 0.5 , 0.05: "))
         buy_limit=int(input("Enter your Buy limit: "))
@@ -224,28 +224,27 @@ def krakenBot():
                 opens.append(float(open1))
                 print("opens")
                 print(opens)
-                if len(opens) > int(RSI_PERIOD):
-                    np_opens = numpy.array(opens)
-                    rsi = talib.RSI(np_opens, RSI_PERIOD)
-                    print("all rsis calculated so far")
-                    print(rsi)
-                    last_rsi = rsi[-1]
-                    print("the current rsi is {}".format(last_rsi))
+                # if len(opens) > int(RSI_PERIOD):
+                #     np_opens = numpy.array(opens)
+                #     rsi = talib.RSI(np_opens, RSI_PERIOD)
+                #     print("all rsis calculated so far")
+                #     print(rsi)
+                #     last_rsi = rsi[-1]
+                #     print("the current rsi is {}".format(last_rsi))
 
-                    if last_rsi > int(RSI_OVERBOUGHT):
-                        if in_position:
-                            print("Overbought! Sell! Sell! Sell!")
-                            # put binance sell logic here
-                            resp = kraken_request('/0/private/AddOrder', {
-                            "nonce": str(int(1000*time.time())),
-                            "ordertype": "market",
-                            "type": "sell",
-                            "volume": TRADE_QUANTITY,
-                            "pair": TRADE_SYMBOL,
-                            }, api_key, api_sec)
+                #     if last_rsi > int(RSI_OVERBOUGHT):
+                #         if in_position:
+                print("Overbought! Sell! Sell! Sell!")
+                # put binance sell logic here
+                resp = kraken_request('/0/private/AddOrder', {
+                "nonce": str(int(1000*time.time())),
+                "ordertype": "market",
+                "type": "sell",
+                "volume": TRADE_QUANTITY,
+                "pair": TRADE_SYMBOL,
+                }, api_key, api_sec)
                             # order_succeeded=''
-                            if resp:
-                                in_position = False
+                
                             # @bot.message_handler(func=order_succeeded)                   
                             # def sendSellSignal(message):
                             #     bot.send_message(message.chat.id, "Sell")

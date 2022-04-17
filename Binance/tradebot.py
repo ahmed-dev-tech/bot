@@ -106,7 +106,7 @@ def on_message(ws, message):
                     print("Overbought! Sell! Sell! Sell!")
                     # put binance sell logic here
                     order_succeeded = order(SIDE_SELL, TRADE_QUANTITY, TRADE_SYMBOL)
-                    order_succeeded=''
+                    # order_succeeded=''
                     if order_succeeded:
                         in_position = False
                     # @bot.message_handler(func=order_succeeded)                   
