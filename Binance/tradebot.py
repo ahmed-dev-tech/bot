@@ -6,13 +6,14 @@ import config as Config
 from datetime import datetime
 import numpy
 import talib
-
+import pprint
 
 class Trade:
     RSI_PERIOD = int(input("Set your RSI period example 14: "))
     RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
     RSI_MID = 40
     RSI_OVERBOUGHT = int(input("Set your RSI OverBought limit eg 70: "))
+
 
     def __init__(self, twm: ThreadedWebsocketManager, client: Client) -> None:
         self.twm = twm
@@ -30,15 +31,15 @@ class Trade:
         self.maxQty = 0
         self.stepSize = 0
 
-    def get_first_set_of_closes(self) -> None:
-        for kline in self.client.get_historical_klines(Config.TRADESYMBOL, Client.KLINE_INTERVAL_1MINUTE, "1 hour ago UTC"):
-            self.closes.append(float(kline[4]))
+    # def get_first_set_of_closes(self) -> None:
+    #     for kline in self.client.get_historical_klines(Config.TRADESYMBOL, Client.KLINE_INTERVAL_1MINUTE, "1 hour ago UTC"):
+    #         self.closes.append(float(kline[4]))
 
     def start(self) -> None:
-        self.get_first_set_of_closes()
+        # self.get_first_set_of_closes()
         self.twm.start()
         self.twm.start_kline_socket(callback=self.handle_socket_message,
-                                    symbol=Config.TRADESYMBOL, interval=Client.KLINE_INTERVAL_1MINUTE)
+                                    symbol=Config.TRADESYMBOL, interval='1m')
 
     def get_round_step_quantity(self, qty):
         info = self.client.get_symbol_info(Config.TRADESYMBOL)
@@ -47,13 +48,17 @@ class Trade:
                 self.minQty = float(x["minQty"])
                 self.maxQty = float(x["maxQty"])
                 self.stepSize= x["stepSize"]
+                print("The Minimum Quantity to Buy {symbol} is {min}".format(symbol=Config.TRADESYMBOL,min=minQty ))
         if qty < self.minQty:
             qty = self.minQty
-        return self.floor_step_size(qty)
+            print("Quantity Set as {q}".format(q=qty))
+        return  self.floor_step_size(qty)
     
     def get_quantity(self, asset):
         balance = self.get_balance(asset=asset)
+        print("Balance is {b}".format(b=balance))
         quantity = self.get_round_step_quantity(float(balance))
+        print("Quantity is {q} of {a}".format(q=quantity,a=asset))
         return quantity
 
     def floor_step_size(self, quantity):
@@ -151,6 +156,7 @@ class Trade:
                 rsi = talib.RSI(np_closes, Trade.RSI_PERIOD)
                 self.last_rsi = rsi[-1]
                 self.buy_or_sell()
+                pprint.pprint(msg)
                 print("PRICE -- {} RSI - {} -- TIME - {}".format(self.close, self.last_rsi, datetime.now().strftime('%H:%M:%S')))
 
 

@@ -1,0 +1,65 @@
+here is backtest file 
+as you will see this is the functionality that calculate MA on parameters you given
+
+
+now i will show you for RSI
+entries is the buy and exit the sell?no
+entries is the parameter 
+
+
+it simply means that whatever the indicator(strategy) you want ...i have to code first 
+
+then if you want that strategy adopt by BOT this will also code with different data pipeline and functionalities and can also takes time to code 
+
+Im a bit confused here man. I will try to see later today if I can write an indicator myself
+
+I have a strategy to start with but I want to test various other things to improve it. So, I need to learn how to change the indicators
+u have to tll me the startgy 
+I will codeit
+take your timeif there is anythin im here
+share the stratey so that we could code it
+thats how it works
+
+Ok I will prepare a file with the indicators and send you. I will try to do it now before I leave. If not I will send later today
+
+one more thing you have to understand that whatever the strategy you have to explain like for example I will show u RSI one 
+
+yteah I think I got that
+will give you all the parameters
+yessss
+
+like for RSI we got these selected variables period overbought oversold then we have a list of opens
+
+in "is_candle_closed"we got True either False if it is True means certain candle closes at that instant we add open values inside our opens 
+
+
+
+then we check if the length of opens are greater then RSI period which we set if yes then it calculate RSI
+
+
+then order of Sell executed if order is sucessful then we set our position false 
+
+
+lastly we if we are are not in position "Buy order will execute""
+
+I hope you understand ..... i need your strategy just like this so it will easy for us to make 
+
+question  not in position mean that I dont have a position open?
+yesss
+
+hmm
+that might be a problem. I will need to open multiple positions for each pair that's how RSI works oh ok
+so for other strategies I will be able to open multiple positions?
+yes makok good!
+
+yes make your strategy test this on paper actually i am not a Finance or Trade person I am a programmer ..... you Yeah I will try to explain in detail
+
+will send you screenshots of the indicators as well to help. The math behind them to be calculated
+but you will probably find them ready through libraries
+
+I search first that these are avaliable in any library if not then code myself. I think they are
+
+anyway I need to go now 
+will be back later
+I will prepare a file with the strategy
+ sure 
