@@ -1,81 +1,121 @@
-# import asyncio
-# from binance import AsyncClient, BinanceSocketManager
+# import config
+# from binance.client import Client
 # from binance.enums import *
-# import pprint
-# import asyncio
-# from binance import AsyncClient, BinanceSocketManager
 
 
-# async def main():
-#     client = await AsyncClient.create()
-#     bm = BinanceSocketManager(client)
-#     # start any sockets here, i.e a trade socket
-#     ks = bm.kline_socket('BNBBTC', interval='15m')
+# RSI_PERIOD = int(input("Set your RSI period example 14: "))
+# RSI_OVERBOUGHT = int(input("Set your RSI OverBought limit eg 70: "))
+# RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
+# TRADE_SYMBOL = input("Trade Symbol (in caps)..... eg 'ETHUSD': ")
+# TRADE_QUANTITY = float(input("Trade Quantity e.g. 0.5 , 0.05: "))
 
-#     # then start receiving messages
-#     async with ks as tscm:
-#         while True:
-#             res = await tscm.recv()
-#             pprint.pprint(res)
 
-#     await client.close_connection()
+# client = Client(config.API_KEY, config.API_SECRET)
 
-# if __name__ == "__main__":
+# def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
+#     try:
+#         print("sending order")
+#         order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
+#         print(order)
+#     except Exception as e:
+#         print("an exception occured - {}".format(e))
+#         return False
+#     return True
 
-#     loop = asyncio.get_event_loop()
-#     loop.run_until_complete(main())
+# order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
+# print(order_succeeded)
 
-from decimal import Decimal
+import websocket, json, pprint, talib, numpy
+import config
 from binance.client import Client
 from binance.enums import *
-from binance import ThreadedWebsocketManager
-import config as Config
-from datetime import datetime
-import numpy
-import talib
-import pprint
+# import telebot
+import os
+# TELE_API_KEY = os.getenv('API_KEY')
+pair=input("Which token pair do you want eg.ethusdt , btcusdt: ")
+tradeDuration=input("Enter Trade Duration eg.... 1m , 1d: ")
 
+SOCKET = "wss://stream.binance.com:9443/ws/{pair}@kline_{tradeDuration}".format(pair=pair,tradeDuration=tradeDuration)
 
-client=Client()
-TRADESYMBOL='BNBETH'
+RSI_PERIOD = int(input("Set your RSI period example 14: "))
+RSI_OVERBOUGHT = int(input("Set your RSI OverBought limit eg 70: "))
+RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
+TRADE_SYMBOL = input("Trade Symbol (in caps)..... eg 'ETHUSD': ")
+TRADE_QUANTITY = float(input("Trade Quantity e.g. 0.5 , 0.05: "))
 
-info = client.get_symbol_info(TRADESYMBOL)
-for x in info["filters"]:
-    if x["filterType"] == "LOT_SIZE":
-        minQty = float(x["minQty"])
-        maxQty = float(x["maxQty"])
-        stepSize= x["stepSize"]
-        print(minQty)
-        print(maxQty)
-        print(stepSize)
+opens = []
+closes = []
+in_position = False
 
-# def get_round_step_quantity(qty):
-#         info = client.get_symbol_info(TRADESYMBOL)
-#         print(info)
-        # for x in info["filters"]:
-        #     if x["filterType"] == "LOT_SIZE":
-        #         minQty = float(x["minQty"])
-        #         maxQty = float(x["maxQty"])
-        #         stepSize= x["stepSize"]
-#         if qty < minQty:
-#             qty = minQty
-#         return floor_step_size(qty)
-# def floor_step_size(quantity):
-#         step_size_dec = Decimal(str(stepSize))
-#         return float(int(Decimal(str(quantity)) / step_size_dec) * step_size_dec)
+client = Client(config.API_KEY, config.API_SECRET)
 
-# def get_quantity(asset):
-#         balance = get_balance(asset=asset)
-#         quantity = get_round_step_quantity(float(balance))
-#         return quantity
+def order(side, quantity, symbol,order_type=ORDER_TYPE_MARKET):
+    try:
+        print("sending order")
+        order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
+        print(order)
+    except Exception as e:
+        print("an exception occured - {}".format(e))
+        return False
+    return True
 
-# def get_balance(asset) -> str:
-#         balance = client.get_asset_balance(asset=asset)
-#         return balance['free']
+def on_open(ws):
+    print('opened connection')
 
+def on_close(ws):
+    print('closed connection')
 
+def on_message(ws, message):
+    global opens,closes, in_position
+    
+    print('received message')
+    json_message = json.loads(message)
+    pprint.pprint(json_message)
 
+    candle = json_message['k']
 
+    is_candle_closed = candle['x']
+    close = candle['c']
+    open1 = candle['o']
 
+    if is_candle_closed:
+        print("candle opens at {}".format(open1))
+        opens.append(float(open1))
+        print("opens")
+        print(opens)
+        
+        if len(opens) > int(RSI_PERIOD):
+            np_opens = numpy.array(opens)
+            rsi = talib.RSI(np_opens, RSI_PERIOD)
+            print("all rsis calculated so far")
+            print(rsi)
+            last_rsi = rsi[-1]
+            print("the current rsi is {}".format(last_rsi))
 
+            if last_rsi > int(RSI_OVERBOUGHT):
+                if in_position:
+                    print("Overbought! Sell! Sell! Sell!")
+                    # put binance sell logic here
+                    order_succeeded = order(SIDE_SELL, TRADE_QUANTITY, TRADE_SYMBOL)
+                    # order_succeeded=''
+                    if order_succeeded:
+                        in_position = False
+                    # @bot.message_handler(func=order_succeeded)                   
+                    # def sendSellSignal(message):
+                    #     bot.send_message(message.chat.id, "Sell")
+                else:
+                    print("It is overbought, but we don't own any. Nothing to do.")
+            
+            if last_rsi < RSI_OVERSOLD:
+                if in_position:
+                    print("It is oversold, but you already own it, nothing to do.")
+                else:
+                    print("Oversold! Buy! Buy! Buy!")
+                    # put binance buy order logic here
+                    order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
+                    # order_succeeded=''
+                    if order_succeeded:
+                        in_position = True
 
+ws = websocket.WebSocketApp(SOCKET, on_open=on_open, on_close=on_close, on_message=on_message)
+ws.run_forever()

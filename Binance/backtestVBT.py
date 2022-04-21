@@ -13,7 +13,6 @@ import vectorbt as vbt
 
 # start = '2019-01-01 UTC'  # crypto is in UTC
 # end = '2020-01-01 UTC'
-
 pair=input("Enter Pair BTCUSDT : ")
 start = input("Enter Start date: yyyy-mm-dd: ")+ " UTC"  # crypto is in UTC
 end = input("Enter End date: yyyy-mm-dd: ")+ " UTC"

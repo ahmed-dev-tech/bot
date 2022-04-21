@@ -13,7 +13,7 @@ class Trade:
     RSI_OVERSOLD = int(input("Set your RSI OverSold limit eg 30: "))
     RSI_MID = 40
     RSI_OVERBOUGHT = int(input("Set your RSI OverBought limit eg 70: "))
-
+    
 
     def __init__(self, twm: ThreadedWebsocketManager, client: Client) -> None:
         self.twm = twm
@@ -31,15 +31,15 @@ class Trade:
         self.maxQty = 0
         self.stepSize = 0
 
-    # def get_first_set_of_closes(self) -> None:
-    #     for kline in self.client.get_historical_klines(Config.TRADESYMBOL, Client.KLINE_INTERVAL_1MINUTE, "1 hour ago UTC"):
-    #         self.closes.append(float(kline[4]))
+    def get_first_set_of_closes(self) -> None:
+        for kline in self.client.get_historical_klines(Config.TRADESYMBOL, Client.KLINE_INTERVAL_1MINUTE, "1 hour ago UTC"):
+            self.closes.append(float(kline[4]))
 
     def start(self) -> None:
-        # self.get_first_set_of_closes()
+        self.get_first_set_of_closes()
         self.twm.start()
         self.twm.start_kline_socket(callback=self.handle_socket_message,
-                                    symbol=Config.TRADESYMBOL, interval='1m')
+                                    symbol=Config.TRADESYMBOL, interval=KLINE_INTERVAL_1MINUTE)
 
     def get_round_step_quantity(self, qty):
         info = self.client.get_symbol_info(Config.TRADESYMBOL)
@@ -84,6 +84,7 @@ class Trade:
             if side == SIDE_BUY:
                 self.buy()
                 self.buy_price = self.close
+                print("Buy Price is {bp}".format(bp=self.buy_price))
                 self.at_loss = False
                 self.BOUGHT = True
                 self.SOLD = False
@@ -144,19 +145,19 @@ class Trade:
             self.order(SIDE_SELL)
 
     def handle_socket_message(self, msg) -> None:
+        # pprint.pprint(msg)
         candle = msg['k']
         self.close = float(candle['c'])
         is_candle_closed = candle['x']
         if is_candle_closed:
             self.closes.append(self.close)
-            if len(self.closes) > 30:
+            if len(self.closes) > Trade.RSI_PERIOD:
                 # We done't want the arry to get too big for the RAM
                 self.closes.pop(0)
                 np_closes = numpy.array(self.closes)
                 rsi = talib.RSI(np_closes, Trade.RSI_PERIOD)
                 self.last_rsi = rsi[-1]
                 self.buy_or_sell()
-                pprint.pprint(msg)
                 print("PRICE -- {} RSI - {} -- TIME - {}".format(self.close, self.last_rsi, datetime.now().strftime('%H:%M:%S')))
 
 
